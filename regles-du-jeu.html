@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASCENDRIFT — Règles du jeu</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0b0d13;
+      --surface:     #12151e;
+      --surface2:    #1a1f2e;
+      --border:      #2a3050;
+      --accent:      #c8a84b;
+      --accent2:     #e8c96a;
+      --red:         #c0392b;
+      --text:        #dce1f0;
+      --muted:       #7a84a0;
+      --radius:      10px;
+      --glow:        0 0 18px rgba(200, 168, 75, 0.25);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── Header ── */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 70px 20px 50px;
+      background: linear-gradient(160deg, #0d1020 0%, #181d30 60%, #0b0d13 100%);
+      border-bottom: 2px solid var(--border);
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(200,168,75,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .logo-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--accent) 0%, #fff5cc 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      margin-bottom: 8px;
+    }
+
+    header h2 {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Table of contents ── */
+    .toc {
+      max-width: 860px;
+      margin: 40px auto 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 36px;
+    }
+
+    .toc h3 {
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .toc ol {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 6px 30px;
+      padding-left: 18px;
+    }
+
+    .toc ol li a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color .2s;
+    }
+
+    .toc ol li a:hover { color: var(--accent2); }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 860px;
+      margin: 50px auto 80px;
+      padding: 0 20px;
+    }
+
+    /* ── Section ── */
+    section {
+      margin-bottom: 52px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .section-icon {
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .divider {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .card p { color: var(--text); margin-bottom: 12px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    /* ── Highlight box ── */
+    .highlight {
+      border-left: 3px solid var(--accent);
+      background: rgba(200, 168, 75, 0.07);
+      padding: 14px 20px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-bottom: 16px;
+      color: var(--accent2);
+      font-weight: 500;
+    }
+
+    .highlight.danger {
+      border-left-color: var(--red);
+      background: rgba(192, 57, 43, 0.08);
+      color: #e07060;
+    }
+
+    /* ── List styles ── */
+    ul.rule-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.rule-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(42,48,80,.5);
+      color: var(--text);
+    }
+
+    ul.rule-list li:last-child { border-bottom: none; }
+
+    ul.rule-list li::before {
+      content: '▸';
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── Class cards grid ── */
+    .class-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 16px;
+    }
+
+    .class-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color .25s, box-shadow .25s;
+      cursor: default;
+    }
+
+    .class-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+
+    .class-card .class-icon { font-size: 2rem; margin-bottom: 10px; }
+    .class-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .class-card ul { list-style: none; padding: 0; }
+    .class-card ul li {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .class-card ul li::before { content: '·'; color: var(--accent); }
+
+    /* ── Stat grid ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .stat-item .stat-icon {
+      font-size: 1.4rem;
+      width: 38px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .stat-item h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .stat-item p { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+    /* ── Tips list ── */
+    .tips-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tips-list li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color .2s;
+    }
+
+    .tips-list li:hover { border-color: var(--accent); }
+    .tips-list li .tip-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      width: 22px;
+      flex-shrink: 0;
+    }
+
+    /* ── Level progress bar ── */
+    .level-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .level-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .level-step .lvl-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #0b0d13;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .level-step p { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    footer span { color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .toc ol { grid-template-columns: 1fr; }
+      .class-grid { grid-template-columns: 1fr 1fr; }
+      .level-track { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 380px) {
+      .class-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<header>
+  <div class="logo-badge">RPG · Survie · Stratégie</div>
+  <h1>ASCENDRIFT</h1>
+  <h2>Règles du jeu</h2>
+
+  <nav class="toc" aria-label="Table des matières">
+    <h3>Sommaire</h3>
+    <ol>
+      <li><a href="#objectif">Objectif du jeu</a></li>
+      <li><a href="#debut">Début de partie</a></li>
+      <li><a href="#classes">Classes disponibles</a></li>
+      <li><a href="#niveau">Système de niveau</a></li>
+      <li><a href="#carac">Caractéristiques</a></li>
+      <li><a href="#stamina">Stamina</a></li>
+      <li><a href="#cartes">Les cartes</a></li>
+      <li><a href="#exploration">Exploration</a></li>
+      <li><a href="#ennemis">Ennemis</a></li>
+      <li><a href="#boss">Les boss</a></li>
+      <li><a href="#stage">Stage system</a></li>
+      <li><a href="#mort">Mort et survie</a></li>
+      <li><a href="#fin">Fin du jeu</a></li>
+      <li><a href="#conseils">Conseils</a></li>
+    </ol>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════ MAIN ════════════════════════════════ -->
+<main>
+
+  <!-- 1. OBJECTIF -->
+  <section id="objectif">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <h2>Objectif du jeu</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="highlight">
+      Atteindre le <strong>niveau 400</strong> et vaincre le <strong>Boss Originel</strong>, le premier boss rencontré au début de l'aventure.
+    </div>
+    <div class="card">
+      <p>Au fil de l'aventure, le joueur :</p>
+      <ul class="rule-list">
+        <li>Explore différentes régions</li>
+        <li>Affronte des ennemis de plus en plus puissants</li>
+        <li>Améliore son personnage</li>
+        <li>Débloque de nouvelles capacités</li>
+        <li>Survit dans un monde dangereux</li>
+      </ul>
+      <p style="margin-top:14px; color: var(--muted); font-size:.9rem;">
+        La victoire finale permet de terminer l'histoire principale et de débloquer la progression maximale du personnage.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. DÉBUT DE PARTIE -->
+  <section id="debut">
+    <div class="section-header">
+      <div class="section-icon">⚔️</div>
+      <h2>Début de partie</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Le joueur commence en :</p>
+      <ul class="rule-list">
+        <li>Choisissant une classe</li>
+        <li>Apparaissant dans la première zone du jeu</li>
+        <li>Découvrant les commandes et la mini-carte</li>
+      </ul>
+    </div>
+    <div class="highlight danger">
+      ⚠️ Très rapidement, le joueur affronte le <strong>Boss Originel</strong>. Ce combat est conçu pour être extrêmement difficile — utilisez-le pour apprendre les mécaniques de jeu.
+    </div>
+    <div class="card">
+      <p>Ce premier affrontement enseigne :</p>
+      <ul class="rule-list">
+        <li>Le système de combat</li>
+        <li>La gestion de la stamina</li>
+        <li>L'esquive</li>
+        <li>Le niveau de difficulté général du jeu</li>
+      </ul>
+      <p style="margin-top:12px; font-style:italic; color:var(--muted);">
+        Après la défaite, le véritable voyage commence.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. CLASSES -->
+  <section id="classes">
+    <div class="section-header">
+      <div class="section-icon">🧙</div>
+      <h2>Classes disponibles</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="class-grid">
+      <div class="class-card">
+        <div class="class-icon">🛡️</div>
+        <h3>Guerrier</h3>
+        <ul>
+          <li>Combat au corps à corps</li>
+          <li>Grande résistance</li>
+          <li>Armes lourdes et boucliers</li>
+          <li>Idéal pour survivre longtemps</li>
+        </ul>
+      </div>
+      <div class="class-card">
+        <div class="class-icon">🏹</div>
+        <h3>Archer</h3>
+        <ul>
+          <li>Combat à distance</li>
+          <li>Grande mobilité</li>
+          <li>Arcs et pièges</li>
+          <li>Rapide mais fragile</li>
+        </ul>
+      </div>
+      <div class="class-card">
+        <div class="class-icon">🗡️</div>
+        <h3>Voleur</h3>
+        <ul>
+          <li>Furtivité et rapidité</li>
+          <li>Attaques critiques</li>
+          <li>Pièges et surprises</li>
+          <li>Faible défense</li>
+        </ul>
+      </div>
+      <div class="class-card">
+        <div class="class-icon">💀</div>
+        <h3>Nécromancien</h3>
+        <ul>
+          <li>Invoque des morts-vivants</li>
+          <li>Magie noire et contrôle de zone</li>
+          <li>Combat à distance</li>
+          <li>Faible endurance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. NIVEAU -->
+  <section id="niveau">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <h2>Système de niveau</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Le joueur gagne de l'expérience en :</p>
+      <ul class="rule-list">
+        <li>Éliminant des ennemis</li>
+        <li>Explorant le monde</li>
+        <li>Survivant aux dangers</li>
+        <li>Battant des boss</li>
+      </ul>
+    </div>
+    <div class="highlight">
+      🏅 Tous les <strong>10 niveaux</strong>, le joueur gagne <strong>3 points de caractéristiques</strong> à répartir librement. Niveau maximum : <strong>400</strong>.
+    </div>
+    <div class="level-track">
+      <div class="level-step">
+        <div class="lvl-badge">Niv. 1–100</div>
+        <p>Région 1<br/>Première carte</p>
+      </div>
+      <div class="level-step">
+        <div class="lvl-badge">Niv. 101–200</div>
+        <p>Région 2<br/>Nouvelles mécaniques</p>
+      </div>
+      <div class="level-step">
+        <div class="lvl-badge">Niv. 201–300</div>
+        <p>Région 3<br/>Ennemis élites</p>
+      </div>
+      <div class="level-step">
+        <div class="lvl-badge">Niv. 301–400</div>
+        <p>Région 4<br/>Boss Originel final</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CARACTÉRISTIQUES -->
+  <section id="carac">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <h2>Caractéristiques</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-icon">❤️</div>
+        <div>
+          <h4>Endurance</h4>
+          <p>Augmente les points de vie et la résistance.</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">💪</div>
+        <div>
+          <h4>Force</h4>
+          <p>Augmente les dégâts physiques.</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">🧠</div>
+        <div>
+          <h4>Intelligence</h4>
+          <p>Renforce les capacités magiques et spéciales.</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">👁️</div>
+        <div>
+          <h4>Instinct</h4>
+          <p>Améliore l'esquive, la vitesse et les coups critiques.</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">🌲</div>
+        <div>
+          <h4>Environnement</h4>
+          <p>Améliore la vision, la détection et la lecture du terrain.</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">🔥</div>
+        <div>
+          <h4>Volonté</h4>
+          <p>Augmente la stamina et la résistance mentale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. STAMINA -->
+  <section id="stamina">
+    <div class="section-header">
+      <div class="section-icon">🏃</div>
+      <h2>Stamina</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="highlight">
+      La stamina est une <strong>ressource essentielle</strong>. Elle se régénère progressivement hors combat.
+    </div>
+    <div class="card" style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div>
+        <p style="font-size:.8rem; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-bottom:10px;">Utilisée pour</p>
+        <ul class="rule-list">
+          <li>Courir</li>
+          <li>Esquiver</li>
+          <li>Bloquer</li>
+          <li>Utiliser certaines attaques</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:.8rem; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:10px;">Si elle tombe à zéro</p>
+        <ul class="rule-list">
+          <li>Le joueur devient vulnérable</li>
+          <li>Mouvements ralentis</li>
+          <li>Certaines actions impossibles</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CARTES -->
+  <section id="cartes">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <h2>Les cartes</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Le monde est divisé en plusieurs grandes régions. Tous les <strong>100 niveaux</strong>, le joueur accède à une nouvelle carte avec :</p>
+      <ul class="rule-list">
+        <li>De nouveaux ennemis</li>
+        <li>De nouveaux dangers</li>
+        <li>De nouvelles mécaniques</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p>Chaque région possède :</p>
+      <ul class="rule-list">
+        <li>Sa propre ambiance</li>
+        <li>Ses propres monstres</li>
+        <li>Ses propres boss</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. EXPLORATION -->
+  <section id="exploration">
+    <div class="section-header">
+      <div class="section-icon">🔭</div>
+      <h2>Exploration</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Le joueur explore le monde à l'aide d'une mini-carte, de sa vision et de son sens de l'observation. Le terrain peut contenir :</p>
+      <ul class="rule-list">
+        <li>Des pièges</li>
+        <li>Des passages secrets</li>
+        <li>Des événements spéciaux</li>
+        <li>Des ressources rares</li>
+      </ul>
+    </div>
+    <div class="highlight">
+      💡 Certaines zones sont cachées ou difficiles à repérer — explorez attentivement chaque recoin.
+    </div>
+  </section>
+
+  <!-- 9. ENNEMIS -->
+  <section id="ennemis">
+    <div class="section-header">
+      <div class="section-icon">👾</div>
+      <h2>Ennemis</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Le jeu contient plusieurs types d'ennemis :</p>
+      <ul class="rule-list">
+        <li>Ennemis normaux</li>
+        <li>Ennemis rares</li>
+        <li>Ennemis élites</li>
+        <li>Boss</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p>Les ennemis deviennent plus puissants au fil des niveaux :</p>
+      <ul class="rule-list">
+        <li>Plus rapides</li>
+        <li>Plus agressifs</li>
+        <li>Plus résistants</li>
+        <li>Avec de nouvelles attaques</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10. BOSS -->
+  <section id="boss">
+    <div class="section-header">
+      <div class="section-icon">👑</div>
+      <h2>Les boss</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Les boss apparaissent régulièrement pendant l'aventure. Chaque boss possède :</p>
+      <ul class="rule-list">
+        <li>Plusieurs attaques spéciales</li>
+        <li>Plusieurs phases</li>
+        <li>Des mécaniques uniques</li>
+      </ul>
+    </div>
+    <div class="highlight danger">
+      ☠️ Certains boss reviennent plus tard sous des <strong>formes plus puissantes</strong>. Le <strong>Boss Originel</strong> est le boss final du jeu.
+    </div>
+  </section>
+
+  <!-- 11. STAGE SYSTEM -->
+  <section id="stage">
+    <div class="section-header">
+      <div class="section-icon">🤝</div>
+      <h2>Stage system</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Pendant certains combats de boss, les amis du joueur peuvent intervenir <em>indirectement</em>. Ils peuvent :</p>
+      <ul class="rule-list">
+        <li>Activer des pièges</li>
+        <li>Modifier temporairement l'arène</li>
+        <li>Distraire le boss</li>
+        <li>Fournir une aide limitée</li>
+      </ul>
+    </div>
+    <div class="highlight">
+      ℹ️ Les amis ne contrôlent <strong>pas directement</strong> un personnage. Le joueur principal reste <strong>seul au combat</strong>.
+    </div>
+  </section>
+
+  <!-- 12. MORT ET SURVIE -->
+  <section id="mort">
+    <div class="section-header">
+      <div class="section-icon">💀</div>
+      <h2>Mort et survie</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Quand le joueur meurt :</p>
+      <ul class="rule-list">
+        <li>Il réapparaît au dernier point de repos découvert</li>
+        <li>Certains ennemis réapparaissent</li>
+        <li>Une partie des ressources peut être perdue</li>
+      </ul>
+    </div>
+    <div class="highlight">
+      🏆 Les boss vaincus <strong>restent éliminés</strong>. Le jeu encourage l'apprentissage par l'échec — chaque mort est une leçon.
+    </div>
+  </section>
+
+  <!-- 13. FIN DU JEU -->
+  <section id="fin">
+    <div class="section-header">
+      <div class="section-icon">🏁</div>
+      <h2>Fin du jeu</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="card">
+      <p>Au <strong>niveau 400</strong>, le joueur :</p>
+      <ul class="rule-list">
+        <li>Atteint la dernière région</li>
+        <li>Affronte la forme ultime du Boss Originel</li>
+        <li>Tente de terminer l'aventure</li>
+      </ul>
+    </div>
+    <div class="highlight">
+      🌟 La victoire finale débloque les statistiques maximales, la fin principale du jeu et les derniers secrets du monde.
+    </div>
+  </section>
+
+  <!-- 14. CONSEILS -->
+  <section id="conseils">
+    <div class="section-header">
+      <div class="section-icon">💡</div>
+      <h2>Conseils</h2>
+      <div class="divider"></div>
+    </div>
+    <ul class="tips-list">
+      <li><span class="tip-num">01</span> Observer avant d'attaquer</li>
+      <li><span class="tip-num">02</span> Gérer correctement sa stamina</li>
+      <li><span class="tip-num">03</span> Explorer chaque zone attentivement</li>
+      <li><span class="tip-num">04</span> Adapter ses caractéristiques à sa classe</li>
+      <li><span class="tip-num">05</span> Utiliser le terrain à son avantage</li>
+      <li><span class="tip-num">06</span> Préparer les combats de boss</li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════ FOOTER ══════════════════════════════ -->
+<footer>
+  <p><span>ASCENDRIFT</span> · RPG difficile · Stratégique · Sombre · Survie</p>
+  <p style="margin-top:6px;">Deviens plus fort grâce à l'expérience, la stratégie et la maîtrise des mécaniques.</p>
+</footer>
+
+</body>
+</html>
